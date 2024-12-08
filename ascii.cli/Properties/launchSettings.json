@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ascii.cli": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Y:\\Apogee\\106635996_post_239.gif\" width=128 charset=123"
+    }
+  }
+}
