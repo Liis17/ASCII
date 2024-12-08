@@ -63,7 +63,7 @@ class Program
     static void ShowHelp()
     {
         Console.WriteLine("Использование:");
-        Console.WriteLine("ascii.cli.dll <путь_к_изображению> [charset=<имя>] [width=<число>] [save=<путь_к_файлу>]");
+        Console.WriteLine("dotnet ascii.cli.dll <путь_к_изображению> [charset=<имя>] [width=<число>] [save=<путь_к_файлу>]");
         Console.WriteLine();
         Console.WriteLine("Параметры:");
         Console.WriteLine("  <путь_к_изображению>    Путь к изображению (обязательный параметр).");
@@ -72,8 +72,8 @@ class Program
         Console.WriteLine("  save=<путь_к_файлу>     Путь для сохранения результата в текстовый файл.");
         Console.WriteLine();
         Console.WriteLine("Примеры:");
-        Console.WriteLine("  ascii.cli.dll image.jpg");
-        Console.WriteLine("  ascii.cli.dll image.jpg charset=blocks width=100 save=output.txt");
+        Console.WriteLine("  dotnet ascii.cli.dll image.jpg");
+        Console.WriteLine("  dotnet ascii.cli.dll image.jpg charset=blocks width=100 save=output.txt");
     }
 
     static string LoadCharset(string charsetName)
