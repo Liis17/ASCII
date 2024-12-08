@@ -15,6 +15,7 @@ class Program
         string charsetName = "default";
         int width = 80;
         string savePath = null;
+        string mode = "color"; // По умолчанию цветной режим
 
         for (int i = 1; i < args.Length; i++)
         {
@@ -24,6 +25,8 @@ class Program
                 width = w;
             else if (args[i].StartsWith("save=", StringComparison.OrdinalIgnoreCase))
                 savePath = args[i].Substring("save=".Length);
+            else if (args[i].StartsWith("mode=", StringComparison.OrdinalIgnoreCase))
+                mode = args[i].Substring("mode=".Length).ToLower();
         }
 
         if (!File.Exists(imagePath))
@@ -42,7 +45,12 @@ class Program
         try
         {
             using var image = new Bitmap(imagePath);
-            string asciiArt = ConvertToColorAscii(image, asciiChars, width);
+
+            // Определяем режим
+            bool isBlackAndWhite = savePath != null || mode == "bw";
+            string asciiArt = isBlackAndWhite
+                ? ConvertToAscii(image, asciiChars, width)
+                : ConvertToColorAscii(image, asciiChars, width);
 
             if (savePath != null)
             {
@@ -60,20 +68,22 @@ class Program
         }
     }
 
+
     static void ShowHelp()
     {
         Console.WriteLine("Использование:");
-        Console.WriteLine("dotnet ascii.cli.dll <путь_к_изображению> [charset=<имя>] [width=<число>] [save=<путь_к_файлу>]");
+        Console.WriteLine("ascii.cli.exe <путь_к_изображению> [charset=<имя>] [width=<число>] [save=<путь_к_файлу>] [mode=<режим>]");
         Console.WriteLine();
         Console.WriteLine("Параметры:");
         Console.WriteLine("  <путь_к_изображению>    Путь к изображению (обязательный параметр).");
         Console.WriteLine("  charset=<имя>           Имя набора символов из папки 'Charsets' (по умолчанию 'default').");
         Console.WriteLine("  width=<число>           Ширина ASCII-арта (по умолчанию 80).");
         Console.WriteLine("  save=<путь_к_файлу>     Путь для сохранения результата в текстовый файл.");
+        Console.WriteLine("  mode=<режим>            Режим вывода: 'color' (по умолчанию) или 'bw' (черно-белый).");
         Console.WriteLine();
         Console.WriteLine("Примеры:");
-        Console.WriteLine("  dotnet ascii.cli.dll image.jpg");
-        Console.WriteLine("  dotnet ascii.cli.dll image.jpg charset=blocks width=100 save=output.txt");
+        Console.WriteLine("  ascii.cli.exe image.jpg");
+        Console.WriteLine("  ascii.cli.exe image.jpg charset=blocks width=100 save=output.txt");
     }
 
     static string LoadCharset(string charsetName)
@@ -87,7 +97,28 @@ class Program
             File.WriteAllText(Path.Combine(charsetsPath, "default.txt"), "@%#*+=-:. ");
         }
 
-        return File.Exists(filePath) ? File.ReadAllText(filePath, encoding: Encoding.UTF8).Trim() : null;
+        return File.Exists(filePath) ? File.ReadAllText(filePath, Encoding.UTF8).Trim() : null;
+    }
+
+    static string ConvertToAscii(Bitmap image, string asciiChars, int width)
+    {
+        int height = (int)(image.Height / (double)image.Width * width * 0.55);
+        var resizedImage = new Bitmap(image, new Size(width, height));
+        var asciiBuilder = new StringBuilder();
+
+        for (int y = 0; y < resizedImage.Height; y++)
+        {
+            for (int x = 0; x < resizedImage.Width; x++)
+            {
+                Color pixelColor = resizedImage.GetPixel(x, y);
+                int grayValue = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
+                int index = grayValue * (asciiChars.Length - 1) / 255;
+                asciiBuilder.Append(asciiChars[index]);
+            }
+            asciiBuilder.AppendLine();
+        }
+
+        return asciiBuilder.ToString();
     }
 
     static string ConvertToColorAscii(Bitmap image, string asciiChars, int width)
