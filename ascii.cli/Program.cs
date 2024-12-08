@@ -15,7 +15,7 @@ class Program
         string charsetName = "default";
         int width = 80;
         string savePath = null;
-        string mode = "color"; // По умолчанию цветной режим
+        string mode = "color"; 
 
         for (int i = 1; i < args.Length; i++)
         {
@@ -46,7 +46,6 @@ class Program
         {
             using var image = new Bitmap(imagePath);
 
-            // Определяем режим
             bool isBlackAndWhite = savePath != null || mode == "bw";
             string asciiArt = isBlackAndWhite
                 ? ConvertToAscii(image, asciiChars, width)
